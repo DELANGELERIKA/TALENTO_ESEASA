@@ -9,19 +9,49 @@
 
 
     <style>
-        body {
-            background-color: white;
-        }
+        
+body {
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.20),
+            rgba(255, 255, 255, 0.20)
+        ),
+        url("{{ url_for('static', filename='img/patio_eseasa.jpg') }}");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
         .navbar {
             background-color: #4387e7f5;
         }
         .navbar-brand {
-            color: white !important;
+            color: rgb(255, 255, 255) !important;
             font-weight: bold;
         }
-        .card {
-            border-radius: 15px;
-        }
+        
+/* RECUADROS TRANSPARENTES */
+.card {
+ background-color: rgba(255, 255, 255, 0.40) !important;
+    border-radius: 15px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.40);
+}
+
+/* CAMPOS DEL FORMULARIO */
+.card .form-control {
+    background-color: rgba(255, 255, 255, 0.40) !important;
+}
+
+/* TABLA DE CANDIDATOS */
+.card .table {
+    --bs-table-bg: rgba(255, 255, 255, 0.65);
+}
+
         .btn {
             border-radius: 10px;
         }
@@ -32,18 +62,19 @@
     </style>
 
 </head>
+<body>
+
 <nav class="navbar navbar-custom">
     <div class="container-fluid d-flex align-items-center">
 
         <img src="{{ url_for('static', filename='img/eoff.png') }}" class="eoff-navbar">
 
         <h3 class="brand-title">
-            CANDIDATOS - ESEASA OFFSHORE
+            CANDIDATOS - RECLUTAMIENTO ESEASA OFFSHORE
         </h3>
 
     </div>
 </nav>
-<body>
 
 <!-- 🔵 NAVBAR -->
 <nav class="navbar navbar-expand-lg">
@@ -120,12 +151,14 @@
         <h5 class="mb-3">Lista de Candidatos</h5>
 
         <div class="table-responsive">
-            <table class="table table-hover table-bordered bg-white shadow-sm">
-
+            <table class="table table-hover table-bordered shadow-sm">
                 <thead class="table-dark">
                     <tr>
                         <th>Nombre</th>
+                        <th>Telefono</th>
+                        <th>Correo</th>
                         <th>Ciudad</th>
+                        <th>Escolaridad</th>
                         <th>Especialidad</th>
                         <th>Disponibilidad</th>
                         <th>CV</th>
@@ -137,19 +170,38 @@
                     {% for c in candidatos %}
                     <tr>
                         <td>{{ c[1] }}</td>
+                        <td>{{ c[2] }}</td>
+                        <td>{{ c[3] }}</td>
                         <td>{{ c[4] }}</td>
-                        <td>{{ c[7] }}</td>
+                        <td>{{ c[5] }}</td>
+                        <td>{{ c[6] }}</td>
                         <td>
-                            <span class="badge bg-success">{{ c[8] }}</span>
+                            <span class="badge bg-success">{{ c[7] }}</span>
                         </td>
 
-                        <td>
-                            {% if c[10] %}
-                                <a href="{{ c[10] }}" target="_blank" class="btn btn-sm btn-info">CV</a>
-                            {% else %}
-                                <span class="text-muted">No</span>
-                            {% endif %}
-                        </td>
+                        
+<td>
+    {% if c[8] %}
+        {% set ruta_cv = c[8]|replace('\\', '/') %}
+
+        {% if ruta_cv.startswith('/static/') %}
+            {% set ruta_cv = ruta_cv[8:] %}
+        {% elif ruta_cv.startswith('static/') %}
+            {% set ruta_cv = ruta_cv[7:] %}
+        {% elif not ruta_cv.startswith('cv/') %}
+            {% set ruta_cv = 'cv/' ~ ruta_cv %}
+        {% endif %}
+
+        <a href="{{ url_for('static', filename=ruta_cv) }}"
+           target="_blank"
+           class="btn btn-sm btn-info">
+            Ver CV
+        </a>
+    {% else %}
+        <span class="text-muted">No</span>
+    {% endif %}
+</td>
+
 
                         <td>
                             <a href="/editar/{{ c[0] }}" class="btn btn-warning btn-sm">✏️</a>

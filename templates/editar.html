@@ -1,10 +1,15 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Editar</title>
+    <meta charset="UTF-8">
+    <title>Editar Candidato</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
+<body class="fondo-eseasa">
 <nav class="navbar navbar-custom">
     <div class="container-fluid d-flex align-items-center">
 
@@ -16,32 +21,81 @@
 
     </div>
 </nav>
-<body class="bg-light">
 
 <div class="container mt-4">
     <div class="card p-4 shadow">
-        <h3>Editar Candidato</h3>
 
-        <form method="POST" action="/actualizar/{{ c[0] }}">
+        <h3 class="mb-3">Editar Candidato</h3>
 
-            <input type="text" name="nombre" class="form-control mb-2" value="{{ c[1] }}">
-            <input type="text" name="telefono" class="form-control mb-2" value="{{ c[2] }}">
-            <input type="email" name="correo" class="form-control mb-2" value="{{ c[3] }}">
-            <input type="text" name="ciudad" class="form-control mb-2" value="{{ c[4] }}">
-            <input type="text" name="escolaridad" class="form-control mb-2" value="{{ c[5] }}">
-            <input type="text" name="especialidad" class="form-control mb-2" value="{{ c[7] }}">
+        <form method="POST"
+              action="/actualizar/{{ c[0] }}"
+              enctype="multipart/form-data">
 
-            <select name="disponibilidad" class="form-control mb-2">
-                <option>{{ c[8] }}</option>
+            <input type="text" name="nombre"
+                   class="form-control mb-2"
+                   value="{{ c[1] }}">
+
+            <input type="text" name="telefono"
+                   class="form-control mb-2"
+                   value="{{ c[2] }}">
+
+            <input type="email" name="correo"
+                   class="form-control mb-2"
+                   value="{{ c[3] }}">
+
+            <input type="text" name="ciudad"
+                   class="form-control mb-2"
+                   value="{{ c[4] }}">
+
+            <input type="text" name="escolaridad"
+                   class="form-control mb-2"
+                   value="{{ c[5] }}">
+
+            <input type="text" name="especialidad"
+                   class="form-control mb-2"
+                   value="{{ c[7] }}">
+
+            <select name="disponibilidad"
+                    class="form-select mb-3">
+
+                <option value="{{ c[8] }}" selected>
+                    {{ c[8] }}
+                </option>
+
                 <option value="Inmediata">Inmediata</option>
                 <option value="15 días">15 días</option>
                 <option value="1 mes">1 mes</option>
+
             </select>
 
-            <button class="btn btn-success">Actualizar</button>
-            <a href="/" class="btn btn-secondary">Cancelar</a>
+            <!-- ACTUALIZAR CV -->
+            <div class="mb-3">
+
+                <label class="form-label fw-bold">
+                    Currículum Vitae (PDF)
+                </label>
+
+                <input type="file"
+                       name="cv_archivo"
+                       class="form-control"
+                       accept=".pdf,application/pdf">
+
+                <small class="text-muted">
+                    Si no seleccionas ninguno, se conservará el anterior.
+                </small>
+
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                Actualizar
+            </button>
+
+            <a href="/" class="btn btn-secondary">
+                Cancelar
+            </a>
 
         </form>
+
     </div>
 </div>
 

@@ -2,6 +2,8 @@
 from flask import Flask, render_template, request, redirect, session
 import mysql.connector
 import os
+from uuid import uuid4
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "secreto123"
@@ -12,6 +14,7 @@ conexion = mysql.connector.connect(
     password="Edelangel20",
     database="talento_eseasa"
 )
+
 
 cursor = conexion.cursor()
 @app.route('/login', methods=['GET', 'POST'])
@@ -40,14 +43,38 @@ def inicio():
     busqueda = request.args.get('busqueda')
 
     if busqueda and busqueda.strip() != "":
-        sql = """SELECT * FROM candidatos 
-                 WHERE nombre LIKE %s 
-                 OR especialidad LIKE %s 
-                 OR ciudad LIKE %s"""
+        sql = """
+            SELECT 
+                id_candidato,
+                nombre,
+                telefono,
+                correo,
+                ciudad,
+                escolaridad,
+                especialidad,
+                disponibilidad,
+                cv_archivo
+            FROM candidatos
+            WHERE nombre LIKE %s 
+            OR especialidad LIKE %s 
+            OR ciudad LIKE %s
+        """
         valores = (f"%{busqueda}%", f"%{busqueda}%", f"%{busqueda}%")
         cursor.execute(sql, valores)
     else:
-        cursor.execute("SELECT * FROM candidatos")
+        cursor.execute("""
+            SELECT 
+                id_candidato,
+                nombre,
+                telefono,
+                correo,
+                ciudad,
+                escolaridad,
+                especialidad,
+                disponibilidad,
+                cv_archivo
+            FROM candidatos
+        """)
 
     candidatos = cursor.fetchall()
     return render_template('index.html', candidatos=candidatos)
@@ -122,17 +149,79 @@ def actualizar(id):
     especialidad = request.form['especialidad']
     disponibilidad = request.form['disponibilidad']
 
-    sql = """UPDATE candidatos SET 
-    nombre=%s, telefono=%s, correo=%s, ciudad=%s,
-    escolaridad=%s, especialidad=%s, disponibilidad=%s
-    WHERE id_candidato=%s"""
+    # Recibir el PDF seleccionado
+    archivo = request.files.get('cv_archivo')
 
-    valores = (nombre, telefono, correo, ciudad, escolaridad, especialidad, disponibilidad, id)
+    nombre_cv = None
+
+    if archivo and archivo.filename:
+
+        # Verificar que sea un archivo PDF
+        nombre_original = secure_filename(archivo.filename)
+
+        if not nombre_original.lower().endswith('.pdf'):
+            return "Error: Solo se permiten archivos PDF", 400
+
+        # Crear la carpeta si no existe
+        carpeta_cv = os.path.join(app.static_folder, 'cv')
+        os.makedirs(carpeta_cv, exist_ok=True)
+
+        # Generar un nombre único para evitar sobrescribir archivos
+        nombre_cv = f"{uuid4().hex}_{nombre_original}"
+
+        ruta_cv = os.path.join(carpeta_cv, nombre_cv)
+
+        # Guardar el nuevo PDF
+        archivo.save(ruta_cv)
+
+    if nombre_cv:
+
+        # Actualizar datos y nuevo CV
+        sql = """
+        UPDATE candidatos SET
+            nombre=%s,
+            telefono=%s,
+            correo=%s,
+            ciudad=%s,
+            escolaridad=%s,
+            especialidad=%s,
+            disponibilidad=%s,
+            cv_archivo=%s
+        WHERE id_candidato=%s
+        """
+
+        valores = (
+            nombre, telefono, correo, ciudad,
+            escolaridad, especialidad,
+            disponibilidad, nombre_cv, id
+        )
+
+    else:
+
+        # Actualizar datos sin modificar el CV existente
+        sql = """
+        UPDATE candidatos SET
+            nombre=%s,
+            telefono=%s,
+            correo=%s,
+            ciudad=%s,
+            escolaridad=%s,
+            especialidad=%s,
+            disponibilidad=%s
+        WHERE id_candidato=%s
+        """
+
+        valores = (
+            nombre, telefono, correo, ciudad,
+            escolaridad, especialidad,
+            disponibilidad, id
+        )
 
     cursor.execute(sql, valores)
     conexion.commit()
 
     return redirect('/')
+
 
 @app.route('/sugerir/<int:id_vacante>')
 def sugerir(id_vacante):

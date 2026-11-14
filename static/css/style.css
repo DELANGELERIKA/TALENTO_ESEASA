@@ -177,3 +177,43 @@ body {
     padding: 18px 40px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
+
+/* FONDO DEL PATIO ESEASA EN TODAS LAS PÁGINAS */
+
+body.fondo-eseasa {
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.20),
+            rgba(255, 255, 255, 0.20)
+        ),
+        url("../img/patio_eseasa.jpg") !important;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+
+/* RECUADROS TRANSPARENTES */
+
+body.fondo-eseasa .card {
+    background-color: rgba(255, 255, 255, 0.40) !important;
+    border-radius: 15px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    border: 1px solid rgba(255, 255, 255, 0.40);
+}
+
+/* CAMPOS DE FORMULARIOS */
+
+body.fondo-eseasa .card .form-control,
+body.fondo-eseasa .card .form-select {
+    background-color: rgba(255, 255, 255, 0.40) !important;
+}
+
+/* TABLAS TRANSPARENTES */
+
+body.fondo-eseasa .table {
+    --bs-table-bg: rgba(255, 255, 255, 0.65);
+}

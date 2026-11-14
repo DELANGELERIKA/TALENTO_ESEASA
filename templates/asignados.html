@@ -16,8 +16,7 @@
 
     </div>
 </nav>
-<body class="bg-light">
-
+<body class="fondo-eseasa">
 <div class="container mt-4">
 
 <h3 class="mb-3">
@@ -51,11 +50,27 @@
                 <td>{{ c[0] }}</td>
                 <td>{{ c[1] }}</td>
                 <td>{{ c[2] }}</td>
-                <td>
-                      <a href="/{{ c[3] }}" target="_blank" class="btn btn-primary btn-sm">
-                      Ver CV
-                      </a>
-                </td>
+                
+ <td> {% if c[3] %}
+    {% set ruta_cv = c[3]|replace('\\', '/') %}
+
+    {% if ruta_cv.startswith('/static/') %}
+        {% set ruta_cv = ruta_cv[8:] %}
+    {% elif ruta_cv.startswith('static/') %}
+        {% set ruta_cv = ruta_cv[7:] %}
+    {% elif not ruta_cv.startswith('cv/') %}
+        {% set ruta_cv = 'cv/' ~ ruta_cv %}
+    {% endif %}
+
+    <a href="{{ url_for('static', filename=ruta_cv) }}"
+       target="_blank"
+       class="btn btn-primary btn-sm">
+        Ver CV
+    </a>
+{% else %}
+    <span class="text-muted">Sin CV</span>
+{% endif %}
+</td>
 
                 <td>
                   <span class="badge bg-info">{{ c[4] }}</span>
